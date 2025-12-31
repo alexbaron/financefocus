@@ -1,0 +1,87 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: financefocus-postgres
+    environment:
+      POSTGRES_DB: financefocus
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - financefocus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U symfony"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Symfony Backend (PHP-FPM)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: financefocus-backend
+    working_dir: /var/www/symfony
+    volumes:
+      - ./backend:/var/www/symfony
+      - symfony_var:/var/www/symfony/var
+    environment:
+      DATABASE_URL: "postgresql://symfony:symfony@postgres:5432/financefocus?serverVersion=16&charset=utf8"
+      APP_ENV: dev
+      APP_SECRET: your-secret-key-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - financefocus-network
+
+  # Nginx for Symfony
+  nginx:
+    image: nginx:alpine
+    container_name: financefocus-nginx
+    volumes:
+      - ./backend:/var/www/symfony
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/certs:/etc/nginx/certs:ro
+    ports:
+      - "8080:80"
+      - "8443:443"
+    depends_on:
+      - backend
+    networks:
+      - financefocus-network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: financefocus-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nginx
+    networks:
+      - financefocus-network
+    command: npm run dev
+
+networks:
+  financefocus-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  symfony_var:

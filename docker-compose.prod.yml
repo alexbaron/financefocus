@@ -1,0 +1,81 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: financefocus-postgres-prod
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-financefocus}
+      POSTGRES_USER: ${POSTGRES_USER:-symfony}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - financefocus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-symfony}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Symfony Backend (PHP-FPM)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: financefocus-backend-prod
+    working_dir: /var/www/symfony
+    volumes:
+      - ./backend:/var/www/symfony
+      - symfony_var:/var/www/symfony/var
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-symfony}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-financefocus}?serverVersion=16&charset=utf8"
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - financefocus-network
+    restart: unless-stopped
+
+  # Nginx for Symfony
+  nginx:
+    image: nginx:alpine
+    container_name: financefocus-nginx-prod
+    volumes:
+      - ./backend:/var/www/symfony
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - financefocus-network
+    restart: unless-stopped
+
+  # Next.js Frontend (Production)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: financefocus-frontend-prod
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080/api}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nginx
+    networks:
+      - financefocus-network
+    restart: unless-stopped
+
+networks:
+  financefocus-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  symfony_var:
