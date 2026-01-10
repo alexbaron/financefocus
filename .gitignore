@@ -18,3 +18,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Metronic source files (not needed - components already integrated)
+metronic-v9.4.0/
+*.zip
