@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const userData = await authService.getCurrentUser();
           setUser(userData);
-        } catch (error) {
+        } catch {
           authService.logout();
         }
       }

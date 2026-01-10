@@ -21,6 +21,10 @@ interface BudgetSummaryProps {
 const BudgetSummary: React.FC<BudgetSummaryProps> = ({ budget, totalDebit, totalCredit }) => {
   const calculateBalance = (credit: number, debit: number): number => credit - debit;
 
+  const formatNumber = (value: number | undefined): string => {
+    return (value || 0).toFixed(2);
+  };
+
   return (
     <div>
       <h2>Résumé du Budget</h2>
@@ -41,25 +45,25 @@ const BudgetSummary: React.FC<BudgetSummaryProps> = ({ budget, totalDebit, total
         <tbody>
           <tr>
             <td>Revenus</td>
-            <td>{budget.income.eur}</td>
-            <td>{budget.income.cad}</td>
-            <td>{totalDebit.eur}</td>
-            <td>{totalDebit.cad}</td>
-            <td>{totalCredit.eur}</td>
-            <td>{totalCredit.cad}</td>
-            <td>{calculateBalance(totalCredit.eur, totalDebit.eur)}</td>
-            <td>{calculateBalance(totalCredit.cad, totalDebit.cad)}</td>
+            <td>{formatNumber(budget.income?.eur)}</td>
+            <td>{formatNumber(budget.income?.cad)}</td>
+            <td>{formatNumber(totalDebit?.eur)}</td>
+            <td>{formatNumber(totalDebit?.cad)}</td>
+            <td>{formatNumber(totalCredit?.eur)}</td>
+            <td>{formatNumber(totalCredit?.cad)}</td>
+            <td>{formatNumber(calculateBalance(totalCredit?.eur || 0, totalDebit?.eur || 0))}</td>
+            <td>{formatNumber(calculateBalance(totalCredit?.cad || 0, totalDebit?.cad || 0))}</td>
           </tr>
           <tr>
             <td>Capitaux</td>
-            <td>{budget.capital && budget.capital.eur}</td>
-            <td>{budget.capital && budget.capital.cad}</td>
-            <td>{totalDebit.eur}</td>
-            <td>{totalDebit.cad}</td>
-            <td>{totalCredit.eur}</td>
-            <td>{totalCredit.cad}</td>
-            <td>{calculateBalance(totalCredit.eur, totalDebit.eur)}</td>
-            <td>{calculateBalance(totalCredit.cad, totalDebit.cad)}</td>
+            <td>{formatNumber(budget.capital?.eur)}</td>
+            <td>{formatNumber(budget.capital?.cad)}</td>
+            <td>{formatNumber(totalDebit?.eur)}</td>
+            <td>{formatNumber(totalDebit?.cad)}</td>
+            <td>{formatNumber(totalCredit?.eur)}</td>
+            <td>{formatNumber(totalCredit?.cad)}</td>
+            <td>{formatNumber(calculateBalance(totalCredit?.eur || 0, totalDebit?.eur || 0))}</td>
+            <td>{formatNumber(calculateBalance(totalCredit?.cad || 0, totalDebit?.cad || 0))}</td>
           </tr>
           {/* Ajoutez d'autres catégories ici */}
         </tbody>

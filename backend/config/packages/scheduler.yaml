@@ -1,0 +1,4 @@
+framework:
+    scheduler:
+        enabled: true
+

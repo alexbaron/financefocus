@@ -1,6 +1,6 @@
-const express = require('express');
-const Database = require('better-sqlite3');
-const cors = require('cors');
+import express from 'express';
+import Database from 'better-sqlite3';
+import cors from 'cors';
 const app = express();
 const port = 3001;
 

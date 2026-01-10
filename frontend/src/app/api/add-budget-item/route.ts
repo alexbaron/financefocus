@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 
-let budgetItems: any[] = [];
+interface BudgetItem {
+  id: number;
+  [key: string]: unknown;
+}
+
+const budgetItems: BudgetItem[] = [];
 
 export async function POST(request: Request) {
   const body = await request.json();

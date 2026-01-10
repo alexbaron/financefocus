@@ -1,6 +1,23 @@
-# FinanceFocus - Docker Setup
+# FinanceFocus - Application de Gestion Financière
 
-Application de gestion financière avec Next.js (frontend) et Symfony (backend).
+Application complète de gestion financière avec Next.js (frontend) et Symfony (backend).
+
+## 🎨 Design System
+
+Ce projet utilise **Metronic v9.4.0** - Un template React professionnel avec plus de 50 composants UI.
+
+### Installation Rapide de Metronic
+
+```bash
+# Installation automatique (recommandé)
+./install-metronic.sh
+
+# Ou suivre le guide manuel
+# Voir METRONIC_QUICKSTART.md pour un guide en 5 minutes
+# Voir METRONIC_INTEGRATION.md pour la documentation complète
+```
+
+**Composants disponibles** : Buttons, Cards, Tables, Forms, Charts, Modals, Alerts, Badges, et bien plus !
 
 ## Architecture
 

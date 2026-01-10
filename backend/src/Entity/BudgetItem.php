@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
+use App\Repository\BudgetItemRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: BudgetItemRepository::class)]
 #[ORM\Table(name: 'budget_items')]
 class BudgetItem
 {
@@ -43,9 +44,24 @@ class BudgetItem
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $user;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+        return $this;
     }
 
     public function getId(): ?int
